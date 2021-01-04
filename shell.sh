@@ -1,6 +1,7 @@
 #!/bin/bash
 
-wd_file="$HOME/.config/i3/wd_$(i3-msg -t get_workspaces | jq '.[] | select(.focused==true).num' | cut -d\" -f2)"
+active_ws=$(i3-msg -t get_workspaces | jq '.[] | select(.focused==true).num' | cut -d\" -f2)
+wd_file="$HOME/.config/i3/wd_$active_ws"
 
 wd="$HOME"
 
