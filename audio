@@ -1,0 +1,13 @@
+#!/bin/bash
+
+pacmd list-sinks | \
+	grep -e 'name:'  | \
+	awk '{ print $2 }' | \
+	sed s'/<//g' | \
+	sed 's/>//g' | \
+	sort | \
+	uniq
+
+read -p 'default sink: ' sink
+
+pacmd set-default-sink "$sink"

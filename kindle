@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -f  "$HOME/.wine/drive_c/Program Files (x86)/Amazon/Kindle/Kindle.exe" ]; then
+  wine "$HOME/.wine/drive_c/Program Files (x86)/Amazon/Kindle/Kindle.exe"
+else
+  google-chrome --app="https://read.amazon.co.uk/"
+fi
