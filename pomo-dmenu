@@ -1,0 +1,10 @@
+#!/bin/bash
+
+SCRIPTPATH="$(cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)"
+
+time=$(echo "" | dmenu -nb "#2F343F" -sb white -sf black -fn "Inconsolata Medium-24" -p "timer> ")
+
+while [ -n "$time" ]; do
+  "$SCRIPTPATH/pomo" "$time"
+  exit
+done
