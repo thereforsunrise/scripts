@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+active_ws_num=$(i3-msg -t get_workspaces | jq '.[] | select(.focused==true).num' | cut -d\" -f2)
+name=$(echo "" | dmenu -nb "#2F343F" -sb white -sf black -fn "Inconsolata Medium-24" -p "workspace name> ")
+
+while [ -n "$name" ]; do
+  i3-msg "rename workspace to \"$active_ws_num $name\""
+  exit
+done
