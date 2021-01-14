@@ -1,6 +1,7 @@
 #!/bin/bash
 
 time=${1:-25}
+message=${2:-"take a well-deserved break"}
 
-echo 'notify-send "take a well-deserved break"' | \
+echo 'notify-send "$message"' | \
   at now + $time minute &>/dev/null
