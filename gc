@@ -3,14 +3,15 @@ gc() {
   local org="$2"
   local repo="$3"
   
+  local checkout_dir="$CODE_DIR/$org"
+  mkdir -p "$checkout_dir"
+
   case "$type" in
     *gh*)
       local repo_base="git@github.com"
-      local checkout_dir="$CODE_DIR"
       ;;
     *bb*)
       local repo_base="git@bitbucket.org"
-      local checkout_dir="$CODE_DIR/work"
       ;;
     *)
       ;;
