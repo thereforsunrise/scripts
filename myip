@@ -1,0 +1,7 @@
+#!/bin/bash
+
+MY_IP=$(curl -s https://myexternalip.com/raw)
+MY_INT_IP=$(hostname -I | awk '{print $1}')
+
+echo -e "External IP:\t$MY_IP"
+echo -e "Internal IP:\t$MY_INT_IP"
