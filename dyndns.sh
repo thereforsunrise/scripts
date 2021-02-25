@@ -11,4 +11,4 @@ else
   MY_IP=$(hostname -I | awk '{print $1}')
 fi
 
-curl "$UPDATE_URL?secret=$UPDATE_SECRET&domain=$SUBDOMAIN&addr=$MY_IP"
+curl -s -L "$UPDATE_URL?secret=$UPDATE_SECRET&domain=$SUBDOMAIN&addr=$MY_IP"
