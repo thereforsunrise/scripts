@@ -1,9 +1,9 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
 if [ ! -f ~/.chef/knife-mvf-$1.rb ]; then
     echo "$1 is not a valid chef environment. Not changing."
-    return
 fi
+
 rm ~/.chef/knife.rb
 ln -s ~/.chef/knife-mvf-$1.rb ~/.chef/knife.rb
 ks
