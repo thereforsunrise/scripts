@@ -8,6 +8,6 @@ pacmd list-sinks | \
 	sort | \
 	uniq
 
-read -p 'default sink: ' sink
+read -r -p 'default sink: ' sink
 
 pacmd set-default-sink "$sink"

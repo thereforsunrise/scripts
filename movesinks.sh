@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sink="$headphones"
+sink="${1:-headphones}"
 
 case "$1" in
   headphones)
@@ -18,9 +18,9 @@ pacmd set-default-sink "$sink"
 pacmd list-sink-inputs | \
   grep index | \
   \
-  while read line; do
+  while read -r line; do
     echo "Moving input: ";
-    echo $line | cut -f2 -d' ';
+    echo "$line" | cut -f2 -d' ';
     echo "to sink: $sink";
-    pacmd move-sink-input `echo $line | cut -f2 -d' '` $sink
+    pacmd move-sink-input "$(echo "$line" | cut -f2 -d' ')" "$sink"
   done

@@ -4,7 +4,8 @@ set -e
 
 agi() {
   local packages_file="$HOME/.dotfiles/packages"
-  local sorted_packages_file=$(mktemp)
+  local sorted_packages_file
+  sorted_packages_file=$(mktemp)
 
   for p in "$@"; do
     if ! apt-cache show "$p"; then
@@ -16,7 +17,7 @@ agi() {
   for p in "$@"; do
     if sudo apt-get install -y "$p"; then
       echo "$p" >> "$packages_file"
-      cat "$packages_file" | sort | uniq > "$sorted_packages_file"
+      sort "$packages_file" | uniq > "$sorted_packages_file"
       mv "$sorted_packages_file" "$packages_file"
     fi
   done

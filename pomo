@@ -4,7 +4,7 @@ time=${1:-25}
 message=${2:-"take a well-deserved break"}
 
 is_literal_time() {
-  echo $time | grep ":" &>/dev/null
+  echo "$time" | grep ":" &>/dev/null
 }
 
 at_s="now + $time minute"

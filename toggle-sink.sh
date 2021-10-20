@@ -20,9 +20,9 @@ pacmd set-default-sink "$new_sink"
 pacmd list-sink-inputs | \
   grep index | \
   \
-  while read line; do
+  while read -r line; do
     echo "Moving input: ";
-    echo $line | cut -f2 -d' ';
+    echo "$line" | cut -f2 -d' ';
     echo "to sink: $new_sink";
-    pacmd move-sink-input `echo $line | cut -f2 -d' '` $new_sink
+    pacmd move-sink-input "$(echo "$line" | cut -f2 -d' ')" "$new_sink"
   done

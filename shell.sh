@@ -6,7 +6,7 @@ wd_file="$HOME/.config/i3/wd_$active_ws"
 wd="$HOME"
 
 if [ -f "$wd_file" ]; then
-  wd="$(cat $wd_file)"
+  wd=$(cat "$wd_file")
 fi
 
 xfce4-terminal --working-directory="$wd"
