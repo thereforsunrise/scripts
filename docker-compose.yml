@@ -14,6 +14,7 @@ services:
       VALIDATE_ENV: "true"
       VALIDATE_GITLEAKS: "true"
       VALIDATE_JSON: "true"
+      VALIDATE_PYTHON: "true"
       VALIDATE_TERRAFORM_TERRASCAN: "true"
       VALIDATE_TERRAFORM_TFLINT: "true"
       VALIDATE_YAML: "true"
