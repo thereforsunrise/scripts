@@ -3,5 +3,13 @@
 time=${1:-25}
 message=${2:-"take a well-deserved break"}
 
-echo "notify-send '$message'" | \
-  at now + $time minute &>/dev/null
+is_literal_time() {
+  echo $time | grep ":" &>/dev/null
+}
+
+at_s="now + $time minute"
+if is_literal_time; then
+  at_s="$time"
+fi
+
+echo "notify-send '$message'" | at "$at_s" &>/dev/null

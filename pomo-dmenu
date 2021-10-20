@@ -2,10 +2,8 @@
 
 SCRIPTPATH="$(cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)"
 
-time=$(echo "" | dmenu -nb "#2F343F" -sb white -sf black -fn "Inconsolata Medium-24" -p "timer>  ")
-time=${time:-10}
+input=$(echo "" | dmenu -nb "#2F343F" -sb white -sf black -fn "Inconsolata Medium-24" -p "timer>  ")
+time=$(echo "$input" | cut -d" " -f1)
+message=$(echo "$input" | cut -d" " -f2)
 
-while [ -n "$time" ]; do
-  "$SCRIPTPATH/pomo" "$time"
-  exit
-done
+"$SCRIPTPATH/pomo" "$time" "$message"
