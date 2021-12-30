@@ -6,6 +6,7 @@ from meross_iot.manager import MerossManager
 import asyncio
 import os
 import sys
+import time
 
 EMAIL = os.environ.get('MEROSS_EMAIL') or "YOUR_MEROSS_CLOUD_EMAIL"
 PASSWORD = os.environ.get('MEROSS_PASSWORD') or "YOUR_MEROSS_CLOUD_PASSWORD"
@@ -22,12 +23,14 @@ async def main():
 
     for bulb in bulbs:
         await bulb.async_update()
-
-        current_color = bulb.get_rgb_color()
-        print(f"Currently, device {bulb.name} is set to color (RGB) = {current_color}")
-
         rgb = 255, 30, 0
-        await bulb.async_set_light_color(onoff=True, rgb=rgb, luminance=100)
+        await bulb.async_set_light_color(rgb=rgb, luminance=100)
+
+    time.sleep(5)
+
+    for bulb in bulbs:
+        await bulb.async_update()
+        await bulb.async_turn_off()
 
     manager.close()
     await http_api_client.async_logout()
