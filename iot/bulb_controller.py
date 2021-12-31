@@ -7,10 +7,6 @@ import asyncio
 import csv
 import os
 import sys
-import time
-
-EMAIL = os.environ.get('MEROSS_EMAIL')
-PASSWORD = os.environ.get('MEROSS_PASSWORD')
 
 def usage():
     print("Usage: %s <csv-file>" % sys.argv[0])
@@ -23,10 +19,10 @@ def read_bulb_settings_from_csv(file):
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
             name, onoff, r, g, b, luminance = row
-            rgb = int(r), int(g), int(b)
-            onoff = onoff.lower() == "on"
-            name = name.strip().lower()
             luminance = int(luminance)
+            name = name.strip().lower()
+            onoff = onoff.lower().strip() == "on"
+            rgb = int(r), int(g), int(b)
 
             bulb_settings[name] = {'onoff': onoff, 'rgb': rgb, 'luminance': luminance}
 
@@ -38,7 +34,10 @@ async def main():
 
     file = sys.argv[1]
 
-    http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
+    email = os.environ.get('MEROSS_EMAIL')
+    password = os.environ.get('MEROSS_PASSWORD')
+
+    http_api_client = await MerossHttpClient.async_from_user_password(email=email, password=password)
 
     manager = MerossManager(http_client=http_api_client)
 
