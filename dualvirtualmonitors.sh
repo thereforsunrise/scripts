@@ -24,3 +24,5 @@ else
   xrandr --delmonitor "$DISPLAY-1"
   xrandr --delmonitor "$DISPLAY-2"
 fi
+
+i3-msg restart

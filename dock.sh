@@ -21,3 +21,5 @@ laptop() {
 }
 
 eval "$mode"
+
+i3-msg restart
