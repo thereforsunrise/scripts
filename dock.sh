@@ -18,7 +18,7 @@ studiomainonly() {
 office() {
   xrandr \
      --output eDP-1 --off \
-     --output HDMI-1 --primary
+     --output DP-2 --primary
 }
 
 x230only() {
