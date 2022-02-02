@@ -12,4 +12,7 @@ if is_literal_time; then
   at_s="$time"
 fi
 
-echo "notify-send '$message'" | at "$at_s" &>/dev/null
+echo "notify-send '$message'" | \
+  at "$at_s" &>/dev/null
+echo "i3-msg mode 'default'" | \
+  at "$at_s" &>/dev/null
