@@ -7,7 +7,7 @@ ip="$(curl -s https://ipinfo.io/ip)"
 curl \
   -s "https://json.geoiplookup.io/$ip" > "$t"
 
-echo "$(date --rfc-3339=seconds)\t$ip" >> "$HOME/.iplog"
+echo -e "$(date --rfc-3339=seconds)\t$ip" >> "$HOME/.iplog"
 
 longitude=$(cat "$t" | jq '.longitude')
 latitude=$(cat "$t" | jq '.latitude')
