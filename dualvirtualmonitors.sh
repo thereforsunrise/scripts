@@ -1,34 +1,51 @@
 #!/bin/bash
 
-# TODO: change this script to accept params of monitor and calculate values
-# HDMI-1 connected primary 2560x1440+0+0 (normal left inverted right x axis y axis) 708mm x 399mm
-
 set -e
 
-COMMAND=$1
-DISPLAY=${2:-DP-2}
+get_primary_display_details() {
+  xrandr --query | \
+    grep '\bconnected\b' | \
+    grep 'primary'
+}
 
-HEIGHT_PX="1440"
-WIDTH_PX="1280"
-WIDTH_MM="354"
-WIDTH_MM_2="355"
+TMP_FILE=$(mktemp)
 
+COMMAND="$1"
+
+PRIMARY_DISPLAY_DETAILS=$(get_primary_display_details)
+
+DISPLAY_NAME=$(echo "$PRIMARY_DISPLAY_DETAILS" | cut -f1 -d' ')
+RESOLUTION=$(echo "$PRIMARY_DISPLAY_DETAILS" | cut -f4 -d' ')
+
+WIDTH_PX=$(echo "$RESOLUTION"  | cut -f1 -d'x')
+HEIGHT_PX=$(echo "$RESOLUTION" | cut -f2 -d'x')
+WIDTH_MM=$(echo "$PRIMARY_DISPLAY_DETAILS"  | cut -f13 -d' ' | sed 's/mm//g')
+HEIGHT_MM=$(echo "$PRIMARY_DISPLAY_DETAILS"  | cut -f15 -d' ' | sed 's/mm//g')
+
+HALF_WIDTH_PX=$(($WIDTH_PX / 2))
+HALF_HEIGHT_PX=$(($HEIGHT_PX / 2))
+HALF_WIDTH_MM=$(($WIDTH_MM / 2))
+HALF_WIDTH_MM_PLUS_ONE=$(($HALF_WIDTH_MM + 1))
+
+echo "Temp script is $TMP_FILE"
+
+# RUNNNING DIRECTLY DOESNT WORK ATM - SOMETHINNG TO DO WITH DISPLAY ENV VAR?
 if [[ "$COMMAND" == "add" ]]; then
-  cat <<EOF
-xrandr \
-  --setmonitor "${DISPLAY}-1" \
-  "$WIDTH_PX/${WIDTH_MM}x${HEIGHT_PX}/399+0+0" \
-  "$DISPLAY"
-xrandr \
-  --setmonitor "${DISPLAY}-2" \
-  "$WIDTH_PX/${WIDTH_MM_2}x${HEIGHT_PX}/399+$WIDTH_PX+0" \
-  none
+  cat <<EOF > "$TMP_FILE"
+#!/bin/bash
+xrandr --setmonitor "${DISPLAY_NAME}-1" ${HALF_WIDTH_PX}/${HALF_WIDTH_MM}x${HALF_HEIGHT_PX}/${HEIGHT_MM}+0+0 $DISPLAY
+xrandr --setmonitor "${DISPLAY_NAME}-2" ${HALF_WIDTH_PX}/${HALF_WIDTH_MM_PLUS_ONE}x${HALF_HEIGHT_PX}/${HEIGHT_MM}+${HALF_WIDTH_PX}+0 none
+i3-msg restart
 EOF
+cat "$TMP_FILE"
 else
-  cat <<EOF
-xrandr --delmonitor "${DISPLAY}-1"
-xrandr --delmonitor "${DISPLAY}-2"
+  cat <<EOF > "$TMP_FILE"
+#!/bin/bash
+xrandr --delmonitor "${DISPLAY_NAME}-1"
+xrandr --delmonitor "${DISPLAY_NAME}-2"
+i3-msg restart
 EOF
 fi
 
-i3-msg restart
+cat "$TMP_FILE"
+chmod 755 "$TMP_FILE"
