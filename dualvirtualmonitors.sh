@@ -15,20 +15,20 @@ WIDTH_MM_2="355"
 
 if [[ "$COMMAND" == "add" ]]; then
   cat <<EOF
-  xrandr \
-    --setmonitor "${DISPLAY}-1" \
-    "$WIDTH_PX/${WIDTH_MM}x${HEIGHT_PX}/399+0+0" \
-    "$DISPLAY"
-  xrandr \
-    --setmonitor "${DISPLAY}-2" \
-    "$WIDTH_PX/${WIDTH_MM_2}x${HEIGHT_PX}/399+$WIDTH_PX+0" \
-    none
+xrandr \
+  --setmonitor "${DISPLAY}-1" \
+  "$WIDTH_PX/${WIDTH_MM}x${HEIGHT_PX}/399+0+0" \
+  "$DISPLAY"
+xrandr \
+  --setmonitor "${DISPLAY}-2" \
+  "$WIDTH_PX/${WIDTH_MM_2}x${HEIGHT_PX}/399+$WIDTH_PX+0" \
+  none
 EOF
 else
   cat <<EOF
-  xrandr --delmonitor "${DISPLAY}-1"
-  xrandr --delmonitor "${DISPLAY}-2"
+xrandr --delmonitor "${DISPLAY}-1"
+xrandr --delmonitor "${DISPLAY}-2"
 EOF
 fi
 
-echo i3-msg restart
+i3-msg restart
