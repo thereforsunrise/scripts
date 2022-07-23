@@ -19,29 +19,30 @@ office() {
   local display=$(xrandr | grep ^DP | grep ' connected' | awk '{ print $1 }')
 
   xrandr \
-     --output eDP-1 --off \
-     --output "$display" --primary
+    --output eDP-1 --off \
+    --output "$display" --auto --primary
 }
 
 officeboth() {
   local display=$(xrandr | grep ^DP | grep ' connected' | awk '{ print $1 }')
 
   xrandr \
-     --output eDP-1 --auto \
-     --below "$display" --primary
+    --output eDP-1 --auto \
+    --below "$display" --primary
 }
 
-
 x230only() {
-    xrandr \
+  xrandr \
     --output LVDS-1 --auto --primary \
     --output HDMI-1 --off
 }
 
 x1only() {
+  local display=$(xrandr | grep ^DP | grep ' connected' | awk '{ print $1 }')
+
   xrandr \
-    --output eDP-1-1 --auto --primary \
-    --output HDMI-1 --off
+    --output eDP-1 --auto --primary \
+    --output "$display" --off
 }
 
 eval "$mode"

@@ -1,0 +1,17 @@
+#!/bin/bash
+# just a script so i remember a bunch of xrandr commands
+
+
+local display=$(xrandr | grep ^DP | grep ' connected' | awk '{ print $1 }')
+
+if [[ -n "$display" ]]; then
+  xrandr \
+    --output eDP-1 --off \
+    --output "$display" --auto --primary
+else
+  xrandr \
+    --output eDP-1 --auto --primary \
+    --output "$display" --off
+fi
+
+i3-msg restart
