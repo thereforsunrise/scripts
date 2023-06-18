@@ -20,7 +20,7 @@ office() {
 
   xrandr \
     --output eDP-1 --off \
-    --output "$display" --auto --primary
+    --output "DP-2" --auto --primary
 }
 
 officeboth() {

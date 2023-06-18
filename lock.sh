@@ -1,3 +1,3 @@
 #!/bin/bash
 
-i3lock -i ~/Dropbox/Media/images/wallpapers/lock.png && sleep 1
+i3lock -i ~/Dropbox/Media/images/wallpapers/new.png && sleep 1
