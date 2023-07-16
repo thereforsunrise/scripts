@@ -1,88 +1,107 @@
 #!/usr/bin/env python3
 
 import cv2
-import time
+import numpy as np
 
-# Constants for line detection
-LINE_THICKNESS = 2
-LINE_COLOR = (0, 255, 0)  # Green color
-MOVEMENT_THRESHOLD = 500  # Adjust this value based on your needs
-RESIZE_SCALE = 1.5  # Adjust the scale factor to resize the image
-RESET_DELAY = 5  # Delay in seconds after pressing 'r'
+# Constants
+LINE_POSITION = 300  # Y-coordinate of the horizontal line
+NEON_ORANGE_LOWER = np.array([10, 100, 100])
+NEON_ORANGE_UPPER = np.array([25, 255, 255])
+DELAY_RESET = 5  # Delay in seconds for resetting the line counter
 
-# Initialize webcam
-cap = cv2.VideoCapture("/dev/video2")  # Use 0 for the default webcam
-
-# Read the first frame
-ret, prev_frame = cap.read()
-prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
-
-# Detect the line
-rows, cols = prev_gray.shape
-line_start = (0, rows // 2)
-line_end = (cols, rows // 2)
-
-# Create a resizable window
-cv2.namedWindow("Line Detection", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("Line Detection", int(cols * RESIZE_SCALE), int(rows * RESIZE_SCALE))  # Adjust the size as desired
-
-# Initialize the line counter
+# Global variables
 line_counter = 0
+reset_counter = False
+object_crossed = False  # Flag to track if the object has crossed the line
 
-# Variable to track reset time
-last_reset_time = time.time()
+# Function to draw the line and counter on the frame
+def draw_line_counter(frame):
+    global line_counter
+    cv2.line(frame, (0, LINE_POSITION), (frame.shape[1], LINE_POSITION), (0, 255, 0), 2)
+    cv2.putText(frame, f"Line Counter: {line_counter}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-while True:
-    # Read the current frame
-    ret, frame = cap.read()
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+# Function to process the frame and detect the neon orange object
+def process_frame(frame):
+    global line_counter, reset_counter, object_crossed
 
-    # Calculate the absolute difference between the current and previous frame
-    frame_diff = cv2.absdiff(gray, prev_gray)
+    # Convert frame to HSV color space
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Apply a threshold to create a binary image
-    _, binary = cv2.threshold(frame_diff, 30, 255, cv2.THRESH_BINARY)
+    # Threshold the frame to extract neon orange regions
+    mask = cv2.inRange(hsv, NEON_ORANGE_LOWER, NEON_ORANGE_UPPER)
 
-    # Find contours of the binary image
-    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Find contours of neon orange objects
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Check if any contour intersects the line
-    line_broken = False
+    # Process each contour
     for contour in contours:
-        (x, y, w, h) = cv2.boundingRect(contour)
-        if y < rows // 2 + LINE_THICKNESS and y + h > rows // 2 - LINE_THICKNESS:
-            line_broken = True
+        area = cv2.contourArea(contour)
+
+        # Check if contour area is above a certain threshold
+        if area > 1000:
+            # Calculate centroid of the contour
+            M = cv2.moments(contour)
+            cX = int(M["m10"] / M["m00"])
+            cY = int(M["m01"] / M["m00"])
+
+            # Check if the centroid is above the line
+            if cY < LINE_POSITION:
+                # If the object has not crossed the line, increment line counter and set the flag
+                if not object_crossed:
+                    line_counter += 1
+                    object_crossed = True
+
+                cv2.drawContours(frame, [contour], -1, (0, 255, 0), 2)
+                cv2.circle(frame, (cX, cY), 7, (0, 255, 0), -1)
+            else:
+                object_crossed = False
+
+    # Draw the line and counter on the frame
+    draw_line_counter(frame)
+
+    # Display the frame
+    cv2.imshow("Object Detection", frame)
+
+    # Reset the line counter if requested
+    if reset_counter:
+        reset_counter = False
+        line_counter = 0
+        cv2.putText(frame, "Counter Reset", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.imshow("Object Detection", frame)
+        cv2.waitKey(DELAY_RESET * 1000)
+
+# Main program
+def main():
+    # Initialize video capture device
+    cap = cv2.VideoCapture('/dev/video2')
+
+    while True:
+        # Read frame from the video capture device
+        ret, frame = cap.read()
+
+        # Check if frame is successfully read
+        if not ret:
             break
 
-    # Draw the line
-    cv2.line(frame, line_start, line_end, LINE_COLOR, LINE_THICKNESS)
+        # Process the frame
+        process_frame(frame)
 
-    # Increment or reset the line counter based on user input
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord('r'):  # Reset the line counter when 'r' is pressed
-        line_counter = 0
-        last_reset_time = time.time()
-    elif key == ord('q'):  # Exit the loop if 'q' is pressed
-        break
+        # Check for user input
+        key = cv2.waitKey(1) & 0xFF
 
-    # Delay for 5 seconds after 'r' is pressed
-    if time.time() - last_reset_time < RESET_DELAY:
-        continue
+        # Check if 'r' key is pressed to reset the line counter
+        if key == ord('r'):
+            global reset_counter
+            reset_counter = True
 
-    # Increment the line counter if the line is broken
-    if line_broken:
-        line_counter += 1
+        # Check if 'q' key is pressed to quit the program
+        if key == ord('q'):
+            break
 
-    # Resize the frame for display
-    resized_frame = cv2.resize(frame, None, fx=RESIZE_SCALE, fy=RESIZE_SCALE)
+    # Release the video capture device and close windows
+    cap.release()
+    cv2.destroyAllWindows()
 
-    # Display the frame and line counter
-    cv2.putText(resized_frame, f"Line Counter: {line_counter}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, LINE_COLOR, 2)
-    cv2.imshow("Line Detection", resized_frame)
-
-    # Update the previous frame and its grayscale version
-    prev_gray = gray.copy()
-
-# Release the webcam and close windows
-cap.release()
-cv2.destroyAllWindows()
+# Run the main program
+if __name__ == '__main__':
+    main()
